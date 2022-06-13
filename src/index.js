@@ -4,8 +4,8 @@ import path from "node:path";
 
 async function main() {
   const pdfBuffer = new SignPDF(
-    path.resolve('test_assets/minions.pdf'),
-    path.resolve('test_assets/certificate.p12')
+    path.resolve("test_assets/minions.pdf"),
+    path.resolve("test_assets/identity.p12")
   );
 
   const signedDocs = await pdfBuffer.signPDF();

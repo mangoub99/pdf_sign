@@ -33,8 +33,8 @@ export default class SignPDF {
   async _addPlaceholder() {
     const loadedPdf = await PDFDocument.load(this.pdfDoc);
     const ByteRange = PDFArrayCustom.withContext(loadedPdf.context);
-    const DEFAULT_BYTE_RANGE_PLACEHOLDER = '**********';
-    const SIGNATURE_LENGTH = 3322;
+    const DEFAULT_BYTE_RANGE_PLACEHOLDER = "**********";
+    const SIGNATURE_LENGTH = 3500;
     const pages = loadedPdf.getPages();
 
     ByteRange.push(PDFNumber.of(0));
@@ -43,24 +43,24 @@ export default class SignPDF {
     ByteRange.push(PDFName.of(DEFAULT_BYTE_RANGE_PLACEHOLDER));
 
     const signatureDict = loadedPdf.context.obj({
-      Type: 'Sig',
-      Filter: 'Adobe.PPKLite',
-      SubFilter: 'adbe.pkcs7.detached',
+      Type: "Sig",
+      Filter: "Adobe.PPKLite",
+      SubFilter: "adbe.pkcs7.detached",
       ByteRange,
-      Contents: PDFHexString.of('A'.repeat(SIGNATURE_LENGTH)),
-      Reason: PDFString.of('We need your signature for reasons...'),
+      Contents: PDFHexString.of("A".repeat(SIGNATURE_LENGTH)),
+      Reason: PDFString.of("We need your signature for reasons..."),
       M: PDFString.fromDate(new Date()),
     });
 
     const signatureDictRef = loadedPdf.context.register(signatureDict);
 
     const widgetDict = loadedPdf.context.obj({
-      Type: 'Annot',
-      Subtype: 'Widget',
-      FT: 'Sig',
+      Type: "Annot",
+      Subtype: "Widget",
+      FT: "Sig",
       Rect: [0, 0, 0, 0], // Signature rect size
       V: signatureDictRef,
-      T: PDFString.of('test signature'),
+      T: PDFString.of("test signature"),
       F: 4,
       P: pages[0].ref,
     });
@@ -68,10 +68,13 @@ export default class SignPDF {
     const widgetDictRef = loadedPdf.context.register(widgetDict);
 
     // Add signature widget to the first page
-    pages[0].node.set(PDFName.of('Annots'), loadedPdf.context.obj([widgetDictRef]));
+    pages[0].node.set(
+      PDFName.of("Annots"),
+      loadedPdf.context.obj([widgetDictRef])
+    );
 
     loadedPdf.catalog.set(
-      PDFName.of('AcroForm'),
+      PDFName.of("AcroForm"),
       loadedPdf.context.obj({
         SigFlags: 3,
         Fields: [widgetDictRef],
